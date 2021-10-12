@@ -117,6 +117,7 @@ class IIIFManifest extends StylePluginBase {
    * {@inheritdoc}
    */
   public function render() {
+    $this->renderFields($this->view->result);
     $json = [];
     $iiif_address = $this->iiifConfig->get('iiif_server');
     if (!is_null($iiif_address) && !empty($iiif_address)) {
