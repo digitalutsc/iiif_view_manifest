@@ -119,14 +119,22 @@ class IIIFManifest extends StylePluginBase {
   public function render() {
     $json = [];
     $iiif_address = $this->iiifConfig->get('iiif_server');
+    $search_url = $this->iiifConfig->get('search_api_url');
+
+    // Get the current URL being requested.
+    $request_url = $this->request->getSchemeAndHttpHost() . $this->request->getRequestUri();
+    // Strip off the last URI component to get the base ID of the URL.
+    // @todo assumming the view is a path like /node/1/manifest.json
+    $url_components = explode('/', $request_url);
+    array_pop($url_components);
+    $iiif_base_id = implode('/', $url_components);
+
+    // get the manifet id form field_manifest_id
+    $nid = $url_components[array_key_last($url_components)];
+    $node = \Drupal\node\Entity\Node::load($nid);
+    $manifest_id = $node->get('field_manifest_id')->getString();
+
     if (!is_null($iiif_address) && !empty($iiif_address)) {
-      // Get the current URL being requested.
-      $request_url = $this->request->getSchemeAndHttpHost() . $this->request->getRequestUri();
-      // Strip off the last URI component to get the base ID of the URL.
-      // @todo assumming the view is a path like /node/1/manifest.json
-      $url_components = explode('/', $request_url);
-      array_pop($url_components);
-      $iiif_base_id = implode('/', $url_components);
       // @see https://iiif.io/api/presentation/2.1/#manifest
       $json += [
         '@type' => 'sc:Manifest',
@@ -134,6 +142,18 @@ class IIIFManifest extends StylePluginBase {
         // If the View has a title, set the View title as the manifest label.
         'label' => $this->view->getTitle() ?: 'IIIF Manifest',
         '@context' => 'http://iiif.io/api/presentation/2/context.json',
+      ];
+      if (!is_null($manifest_id) && !empty($manifest_id)) {
+        $search_id = str_replace("[manifest_id]", $manifest_id, $search_url);
+        $json += [
+          "service" => [ 
+            "profile" => "http://iiif.io/api/search/0/search",
+            "@id" => $search_id,
+            "@context" => "http://iiif.io/api/search/0/context.json"
+          ],
+        ];
+      }
+      $json += [
         // @see https://iiif.io/api/presentation/2.1/#sequence
         'sequences' => [
           [
