@@ -72,12 +72,6 @@ class IslandoraIIIFConfigForm extends ConfigFormBase {
       '#description' => $this->t('Please enter the image server location without trailing slash. e.g. http://www.example.org/iiif/2.'),
       '#default_value' => $config->get('iiif_server'),
     ];
-    $form['search_api_url'] = [
-      '#type' => 'url',
-      '#title' => $this->t('search API url'),
-      '#description' => $this->t('Please enter the search API url without trailing slash. e.g. http://localhost:8888/search-api/[manifest_id]/search.'),
-      '#default_value' => $config->get('search_api_url'),
-    ];
     return parent::buildForm($form, $form_state);
   }
 
@@ -104,9 +98,6 @@ class IslandoraIIIFConfigForm extends ConfigFormBase {
 
     $this->config('islandora_iiif.settings')
       ->set('iiif_server', $form_state->getValue('iiif_server'))
-      ->save();
-    $this->config('islandora_iiif.settings')
-      ->set('search_api_url', $form_state->getValue('search_api_url'))
       ->save();
   }
 
