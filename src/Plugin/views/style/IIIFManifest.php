@@ -127,12 +127,19 @@ class IIIFManifest extends StylePluginBase {
       $url_components = explode('/', $request_url);
       array_pop($url_components);
       $iiif_base_id = implode('/', $url_components);
+      
+      // Get title of the work
+      $url_segments = explode("/", $iiif_base_id);
+      $nid = end($url_segments);
+      $node = \Drupal\node\Entity\Node::load($nid);
+      $title = $node->getTitle();
+      
       // @see https://iiif.io/api/presentation/2.1/#manifest
       $json += [
         '@type' => 'sc:Manifest',
         '@id' => $request_url,
         // If the View has a title, set the View title as the manifest label.
-        'label' => $this->view->getTitle() ?: 'IIIF Manifest',
+        'label' => $title ?: 'IIIF Manifest',
         '@context' => 'http://iiif.io/api/presentation/2/context.json',
         // @see https://iiif.io/api/presentation/2.1/#sequence
         'sequences' => [
