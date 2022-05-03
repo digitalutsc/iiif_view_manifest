@@ -131,8 +131,11 @@ class IIIFManifest extends StylePluginBase {
       // Get title of the work
       $url_segments = explode("/", $iiif_base_id);
       $nid = end($url_segments);
-      $node = \Drupal\node\Entity\Node::load($nid);
-      $title = $node->getTitle();
+      
+      if (is_numeric($nid)) {
+        $node = \Drupal\node\Entity\Node::load($nid);
+        $title = $node->getTitle();
+      }
       
       // @see https://iiif.io/api/presentation/2.1/#manifest
       $json += [
