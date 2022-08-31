@@ -133,8 +133,15 @@ class IIIFManifest extends StylePluginBase {
       $nid = end($url_segments);
       
       if (is_numeric($nid)) {
-        $node = \Drupal\node\Entity\Node::load($nid);
-        $title = $node->getTitle();
+        $entity_type = $url_segments[count($url_segments)-2];
+        if ($entity_type === "node") {
+          $node = \Drupal\node\Entity\Node::load($nid);
+          $title = $node->getTitle();
+        }
+        else if ($entity_type === "media") {
+          $node = \Drupal\media\Entity\Media::load($nid);
+          $title = $node->getName();
+        }
       }
       
       // @see https://iiif.io/api/presentation/2.1/#manifest
