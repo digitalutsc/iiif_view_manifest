@@ -52,7 +52,7 @@ class IIIFManifest extends StylePluginBase {
   /**
    * The serializer which serializes the views result.
    *
-   * @var \Symfony\Component\Serializer\Serializer
+   * @var \Symfony\Component\Serializer\SerializerInterface
    */
   protected $serializer;
 
@@ -73,7 +73,7 @@ class IIIFManifest extends StylePluginBase {
   /**
    * The Drupal Filesystem.
    *
-   * @var \Drupal\Core\File\FileSystem
+   * @var \Drupal\Core\File\FileSystemInterface
    */
   protected $fileSystem;
 
@@ -83,6 +83,13 @@ class IIIFManifest extends StylePluginBase {
    * @var \Drupal\Core\Messenger\MessengerInterface
    */
   protected $messenger;
+
+  /**
+   * The HTTP client.
+   *
+   * @var \GuzzleHttp\Client
+   */
+  protected $httpClient;
 
   /**
    * {@inheritdoc}
@@ -151,7 +158,7 @@ class IIIFManifest extends StylePluginBase {
         '@type' => 'sc:Manifest',
         '@id' => $request_url,
         // If the View has a title, set the View title as the manifest label.
-        'label' => $title ?: 'IIIF Manifest',
+        'label' => $title ?? 'IIIF Manifest',
         '@context' => 'http://iiif.io/api/presentation/2/context.json',
         // @see https://iiif.io/api/presentation/2.1/#sequence
         'sequences' => [

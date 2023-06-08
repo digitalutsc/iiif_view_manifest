@@ -112,7 +112,7 @@ class IslandoraIIIFConfigForm extends ConfigFormBase {
    */
   private function validateIiifUrl($server_uri) {
     try {
-      $result = $this->httpClient->head($server_uri);
+      $result = $this->httpClient->request('HEAD', $server_uri);
       return ($result->getStatusCode() == 200);
     }
     catch (ClientException $e) {
