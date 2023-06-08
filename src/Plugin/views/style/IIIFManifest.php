@@ -2,6 +2,8 @@
 
 namespace Drupal\islandora_iiif\Plugin\views\style;
 
+use Drupal\media\Entity\Media;
+use Drupal\node\Entity\Node;
 use Drupal\views\Plugin\views\style\StylePluginBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
@@ -127,23 +129,23 @@ class IIIFManifest extends StylePluginBase {
       $url_components = explode('/', $request_url);
       array_pop($url_components);
       $iiif_base_id = implode('/', $url_components);
-      
-      // Get title of the work
+
+      // Get title of the work.
       $url_segments = explode("/", $iiif_base_id);
       $nid = end($url_segments);
-      
+
       if (is_numeric($nid)) {
-        $entity_type = $url_segments[count($url_segments)-2];
+        $entity_type = $url_segments[count($url_segments) - 2];
         if ($entity_type === "node") {
-          $node = \Drupal\node\Entity\Node::load($nid);
+          $node = Node::load($nid);
           $title = $node->getTitle();
         }
-        else if ($entity_type === "media") {
-          $node = \Drupal\media\Entity\Media::load($nid);
+        elseif ($entity_type === "media") {
+          $node = Media::load($nid);
           $title = $node->getName();
         }
       }
-      
+
       // @see https://iiif.io/api/presentation/2.1/#manifest
       $json += [
         '@type' => 'sc:Manifest',
@@ -224,8 +226,8 @@ class IIIFManifest extends StylePluginBase {
             if (empty($width) || empty($height)) {
               // Get the image properties so we know the image width/height.
               $properties = $image->getProperties();
-              $width = isset($properties['width']) ? $properties['width'] : 0;
-              $height = isset($properties['height']) ? $properties['height'] : 0;
+              $width = $properties['width'] ?? 0;
+              $height = $properties['height'] ?? 0;
 
               // If this is a TIFF AND we don't know the width/height
               // see if we can get the image size via PHP's core function.
